@@ -3,6 +3,7 @@ import numpy as np
 from gdsfactory.generic_tech import get_generic_pdk
 
 
+
 class GratingCoupler():
 
     def __init__(self):
@@ -25,7 +26,7 @@ class GratingCoupler():
         self.rot = rot
         self.wg_length = wg_length
 
-        wg3 = gf.components.straight(length = 200, width=waveguide_width)
+        wg3 = gf.components.straight(length = wg_length, width=waveguide_width)
         gap = period * (1 - fill_factor)
         width = period * fill_factor
         gc = gf.components.grating_coupler_elliptical_arbitrary(
@@ -39,7 +40,7 @@ class GratingCoupler():
         gc_ref = self.c.add_ref(gc)
         gc_ref.move((pos_x, pos_y))
         gc_ref.rotate(rot)
-        wg = gf.components.straight(length = 200, width=waveguide_width)
+        wg = gf.components.straight(length = wg_length, width=waveguide_width)
         wg_ref = self.c.add_ref(wg)
         wg_ref.move((wg_length, pos_y))
         wg_ref.connect("o2", gc_ref.ports["o1"])
@@ -47,7 +48,7 @@ class GratingCoupler():
         upArc_shape = upArc.extrude(width = waveguide_width, layer=(1, 0))
         upArc_ref = self.c.add_ref(upArc_shape)
         upArc_ref.rotate(0)
-        upArc_ref.move((-pos_x + 200, pos_y))
+        upArc_ref.move((-pos_x + wg_length, pos_y))
         wg2 = gf.components.straight(length=117, width=waveguide_width)
         wg_ref2 = self.c.add_ref(wg2)
         wg_ref2.rotate(90)
@@ -57,7 +58,7 @@ class GratingCoupler():
         downArc = gf.path.arc(radius= 5, angle=-90)
         downArc_shape = downArc.extrude(width = waveguide_width, layer=(1, 0))
         downArc_ref = self.c.add_ref(downArc_shape)
-        downArc_ref.move((pos_x + 200, pos_y - 127))
+        downArc_ref.move((pos_x + wg_length, pos_y - 127))
         downArc_ref.rotate(0)
         downArc_ref.connect("o2", wg_ref2.ports["o2"])
         gc2 = gf.components.grating_coupler_elliptical_arbitrary(
@@ -81,7 +82,7 @@ class GratingCoupler():
         self.period, self.fill_factor, self.number_of_loops = period, fill_factor, number_of_loops
         self.pos_x, self.pos_y = pos_x, pos_y
         self.lengthx = lengthx
-        snake = gf.components.spiral(length = lengthx, spacing=10, bend="bend_euler", n_loops = number_of_loops, cross_section=gf.cross_section.strip(width=1, layer=(1, 0)))
+        snake = gf.components.spiral(length = lengthx, spacing=6, bend="bend_euler", n_loops = number_of_loops, cross_section=gf.cross_section.strip(width=1, layer=(1, 0)))
         snake_ref = self.c.add_ref(snake)
         snake_ref.move((pos_x, pos_y))
         snake_ref.rotate(180)
@@ -121,7 +122,7 @@ class GratingCoupler():
         arcup_ref = self.c.add_ref(arcup_shape)  
         arcup_ref.connect("o2", wgdown_ref.ports["o2"])
 
-        wgminus = gf.components.straight(length=41, width=1)
+        wgminus = gf.components.straight(length=36, width=1)
         wgminus_ref = self.c.add_ref(wgminus)
         wgminus_ref.connect("o1", arcup_ref.ports["o1"])
 
