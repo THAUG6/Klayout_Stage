@@ -152,7 +152,7 @@ class GratingCoupler():
         self.xlength = x_length
         self.pos_x, self.pos_y = pos_x, pos_y
         self.delta = delta
-        mzi = gf.components.mzi(delta_length=delta, length_y=5, length_x=x_length, bend='bend_euler', straight='straight', splitter=self.mmi1x2_custom(), with_splitter=True, port_e1_splitter='o2', port_e0_splitter='o3', port_e1_combiner='o2', port_e0_combiner='o3', port1='o1', port2='o2', nbends=2, cross_section=gf.cross_section.strip(width = 1), cross_section_x_bot=gf.cross_section.strip(width = 1),cross_section_x_top=gf.cross_section.strip(width = 1), mirror_bot=False, add_optical_ports_arms=False, min_length=0.01, auto_rename_ports=True).copy()
+        mzi = gf.components.mzi(delta_length=delta, length_y=0.1, length_x=x_length, bend='bend_euler', straight='straight', splitter=self.mmi1x2_custom(), with_splitter=True, port_e1_splitter='o2', port_e0_splitter='o3', port_e1_combiner='o2', port_e0_combiner='o3', port1='o1', port2='o2', nbends=2, cross_section=gf.cross_section.strip(width = 1), cross_section_x_bot=gf.cross_section.strip(width = 1),cross_section_x_top=gf.cross_section.strip(width = 1), mirror_bot=False, add_optical_ports_arms=False, min_length=0.01, auto_rename_ports=True).copy()
         mzi_ref = self.c.add_ref(mzi)
         mzi_ref.move((pos_x, pos_y))
 
