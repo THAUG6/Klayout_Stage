@@ -4,29 +4,37 @@ from gdsfactory.generic_tech import get_generic_pdk
 
 
 
-class GratingCoupler():
+#Class to test grating couplers
+class GratingCouplerTest():
 
+    #Initialize Components and pdk
     def __init__(self):
         self.c = gf.Component()
         PDK = get_generic_pdk()
         PDK.activate()
 
-
+    #Select KLayout file used for drawing 
     def write_gds(self, filename):
         self.filename = filename
         self.c.write_gds(filename + ".gds")
 
 
-    def grating_coupler(self, period, fill_factor, waveguide_width, pos_x, pos_y, rot, wg_length):
-        self.period = period
-        self.fill_factor = fill_factor
-        self.waveguide_width = waveguide_width
-        self.pos_x = pos_x
-        self.pos_y = pos_y
-        self.rot = rot
-        self.wg_length = wg_length
+    #Draws C-Shape, with two grating couplers
+    def CSHAPE(self, period, fill_factor, waveguide_width, pos_x, pos_y, rot, wg_length):
 
+        #C-shape design parameters
+        self.period = period #Period of the grating
+        self.fill_factor = fill_factor #Fill-Factor (Duty-Cycle) of the grating
+        self.waveguide_width = waveguide_width #Waveguide width at the end of the taper
+        self.pos_x = pos_x # x position in .gds file
+        self.pos_y = pos_y # y position in .gds file
+        self.rot = rot # Rotation of the grating coupler (0: Input from right to left, 180: Input from left to right)
+        self.wg_length = wg_length #Length of the waveguide after grating coupler
+
+        #Creation of waveguides in C-Shape
         wg3 = gf.components.straight(length = wg_length, width=waveguide_width)
+
+        #Creation of grating coupler
         gap = period * (1 - fill_factor)
         width = period * fill_factor
         gc = gf.components.grating_coupler_elliptical_arbitrary(
@@ -78,16 +86,20 @@ class GratingCoupler():
         gc2_ref.connect("o1", wg_ref3.ports["o2"])
 
 
+    #Function for drawing spiral, with two grating couplers
     def spiral(self, period, fill_factor, number_of_loops, pos_x, pos_y, lengthx):
+        #Spiral parameters
         self.period, self.fill_factor, self.number_of_loops = period, fill_factor, number_of_loops
         self.pos_x, self.pos_y = pos_x, pos_y
         self.lengthx = lengthx
+
+        #Creation of spiral
         snake = gf.components.spiral(length = lengthx, spacing=6, bend="bend_euler", n_loops = number_of_loops, cross_section=gf.cross_section.strip(width=1, layer=(1, 0)))
         snake_ref = self.c.add_ref(snake)
         snake_ref.move((pos_x, pos_y))
         snake_ref.rotate(180)
 
-
+        #Creation of grating coupler
         gap = period * (1 - fill_factor)
         width = period * fill_factor
         gc = gf.components.grating_coupler_elliptical_arbitrary(
@@ -137,6 +149,7 @@ class GratingCoupler():
         gc2_ref.connect("o1", wgminus_ref.ports["o2"])
         snake_ref.flatten()
 
+    #Creation of text layer in Klayout drawing
     def text(self, texts, size, position):
         self.texts = texts
         self.size = size
@@ -145,13 +158,13 @@ class GratingCoupler():
         self.text_ref = self.c.add_ref(self.text_component)
         return self.text_ref
     
-
+    #Creation of MZIs in Klayout drawing
     def MZI(self, period, fill_factor, delta, x_length, pos_x, pos_y):
-        self.period = period
-        self.fill_factor = fill_factor
-        self.xlength = x_length
-        self.pos_x, self.pos_y = pos_x, pos_y
-        self.delta = delta
+        self.period = period #Period of grating
+        self.fill_factor = fill_factor #Fill factor of grating
+        self.xlength = x_length #x length of MZI's arms
+        self.pos_x, self.pos_y = pos_x, pos_y #Position of MZI
+        self.delta = delta  # Length difference betweem the two arms
         mzi = gf.components.mzi(delta_length=delta, length_y=0.1, length_x=x_length, bend='bend_euler', straight='straight', splitter=self.mmi1x2_custom(), with_splitter=True, port_e1_splitter='o2', port_e0_splitter='o3', port_e1_combiner='o2', port_e0_combiner='o3', port1='o1', port2='o2', nbends=2, cross_section=gf.cross_section.strip(width = 1), cross_section_x_bot=gf.cross_section.strip(width = 1),cross_section_x_top=gf.cross_section.strip(width = 1), mirror_bot=False, add_optical_ports_arms=False, min_length=0.01, auto_rename_ports=True).copy()
         mzi_ref = self.c.add_ref(mzi)
         mzi_ref.move((pos_x, pos_y))
@@ -195,13 +208,12 @@ class GratingCoupler():
         wavelength=1.55,
         cross_section=gf.cross_section.strip(width=1, layer=(1, 0))
         )
-        gc2_ref = self.c.add_ref(gc)
+        gc2_ref = self.c.add_ref(gc2)
         gc2_ref.rotate(180)
         gc2_ref.connect("o1", mzi_ref.ports["o1"])
-
-
         mzi.flatten()
     
+    #Creation of MZI splitter shape
     def mmi1x2_custom(self):
         return gf.components.mmi1x2(
             width=1.0,  
