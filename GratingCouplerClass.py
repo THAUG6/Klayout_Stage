@@ -78,7 +78,7 @@ class GratingCoupler():
         gc2_ref.connect("o1", wg_ref3.ports["o2"])
 
 
-    def snake(self, period, fill_factor, number_of_loops, pos_x, pos_y, lengthx):
+    def spiral(self, period, fill_factor, number_of_loops, pos_x, pos_y, lengthx):
         self.period, self.fill_factor, self.number_of_loops = period, fill_factor, number_of_loops
         self.pos_x, self.pos_y = pos_x, pos_y
         self.lengthx = lengthx
